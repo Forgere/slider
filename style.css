@@ -1,0 +1,13 @@
+.slider{
+	margin-top: 10%;
+	margin-left: 20%;
+}
+ul{
+	list-style: none;
+	overflow: hidden;
+	width: 10000px;
+}
+li{
+	list-style: none;
+	float: left;
+}
