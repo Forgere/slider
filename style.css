@@ -1,13 +1,18 @@
 .slider{
 	margin-top: 10%;
 	margin-left: 20%;
+	overflow: hidden;
 }
 ul{
 	list-style: none;
 	overflow: hidden;
 	width: 10000px;
+	padding-left: 0;
 }
 li{
 	list-style: none;
 	float: left;
+}
+span{
+	font-size: 26px;
 }
