@@ -1,6 +1,44 @@
 (function($){
+    var array=[];
     var silde = {
         init:function(a,number,gundong,status){
+            var linumber= number + 1,
+                $ul = $(a).find("ul"),
+                $lis = $ul.children("li"),
+                width = $lis.eq(0).width(),
+                mf=parseInt($ul.css('margin-left')),
+                numberaccout = number || 4,
+                lanumber= $lis.length;
+            for (var i = linumber-1; i < lanumber; i++) {
+                array.push($ul.find("img")[i].src);
+                console.log(array);
+                $ul.find("img")[i].src = '';
+            }
+            $('.arrow-right').click(function(){
+                if(-parseInt($ul.css('margin-left'))>($lis.length-numberaccout-1)*width){
+                    return;
+                }
+                mf = parseInt($ul.css('margin-left')) -width;
+                index = -mf/width+number-1;
+                if(index>(number-1)){
+                    $ul.find("img")[index].src=array[index-number];
+                }
+                $ul.stop().animate({
+                        'margin-left':mf +'px'
+                    },
+                    'fast');
+                });
+            $('.arrow-left').click(function(){
+                if(-parseInt($ul.css('margin-left')) < width){
+                    return;
+                }
+                mf = parseInt($ul.css('margin-left')) +width;
+                $ul.stop().animate({
+                        'margin-left':mf +'px'
+                    },
+                    'fast');
+                }
+            );
             this.auto(a,number,gundong,status);
         },
         auto:function(a,number,gundong,status){
@@ -14,14 +52,8 @@
                 lanumber= $lis.length,
                 gundongaccout = gundong || 1,
                 auto_status = status || true,
-                array=[],
-                mf=parseInt($ul.css('margin-left'));
-            for (var i = linumber-1; i < lanumber; i++) {
-                array.push($ul.find("img")[i].src);
-                console.log(array);
-                $ul.find("img")[i].src= '';
-            }
-
+                mf=parseInt($ul.css('margin-left')),
+                havesend=0;
             $(a).css({'width':width*numberaccout});
                 if(auto_status){
                     timemachine=setInterval(function(){
@@ -47,32 +79,11 @@
             });
             // 鼠标移开
             $('.slider').mouseleave(function(){
-                silde.init(a,number,gundong,auto_status);
+                silde.auto(a,number,gundong,auto_status);
             });
-            $('.arrow-right').click(function(){
-                if(-mf>($lis.length-numberaccout-1)*width){
-                    return;
-                }
-                mf = mf -width;
-                $ul.stop().animate({
-                        'margin-left':mf +'px'
-                    },
-                    'fast');
-                });
-            $('.arrow-left').click(function(){
-                if(-mf < width){
-                    return;
-                }
-                mf = mf +width;
-                $ul.stop().animate({
-                        'margin-left':mf +'px'
-                    },
-                    'fast');
-                }
-            );
         }
     };
     $(function(){
-        silde.init('.slider',2,1,true);
+        silde.init('.slider',3,3,true);
     });
 })(jQuery);
