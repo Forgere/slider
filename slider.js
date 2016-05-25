@@ -7,6 +7,7 @@
                 $lis = $ul.children("li"),
                 width = $lis.eq(0).width(),
                 mf=parseInt($ul.css('margin-left')),
+                gundongaccout = gundong || 1,
                 numberaccout = number || 4,
                 lanumber= $lis.length;
             for (var i = linumber-1; i < lanumber; i++) {
@@ -18,10 +19,17 @@
                 if(-parseInt($ul.css('margin-left'))>($lis.length-numberaccout-1)*width){
                     return;
                 }
-                mf = parseInt($ul.css('margin-left')) -width;
+                mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
                 index = -mf/width+number-1;
-                if(index>(number-1)){
-                    $ul.find("img")[index].src=array[index-number];
+                if(gundongaccout===1){
+                    if(index>(numberaccout-1)){
+                        $ul.find("img")[index].src=array[index-numberaccout];
+                    }
+                }else{
+                    for (var i = 0; i < gundongaccout; i++) {
+                        console.log(i);
+                        $ul.find("img")[i+numberaccout].src=array[i];
+                    }
                 }
                 $ul.stop().animate({
                         'margin-left':mf +'px'
@@ -32,7 +40,7 @@
                 if(-parseInt($ul.css('margin-left')) < width){
                     return;
                 }
-                mf = parseInt($ul.css('margin-left')) +width;
+                mf = parseInt($ul.css('margin-left')) +width*gundongaccout;
                 $ul.stop().animate({
                         'margin-left':mf +'px'
                     },
@@ -58,13 +66,20 @@
                 if(auto_status){
                     timemachine=setInterval(function(){
                         if(-mf<($lis.length-numberaccout)*width){
-                            mf = mf -width*gundong;
+                            mf = mf -width*gundongaccout;
                         }else{
                             mf = 0;
                         }
-                        index = -mf/width+number-1;
-                        if(index>(number-1)){
-                            $ul.find("img")[index].src=array[index-number];
+                        index = -mf/width+numberaccout-1;
+                        if(gundongaccout===1){
+                            if(index>(numberaccout-1)){
+                                $ul.find("img")[index].src=array[index-numberaccout];
+                            }
+                        }else{
+                            for (var i = 0; i < gundongaccout; i++) {
+                                console.log(i);
+                                $ul.find("img")[i+numberaccout].src=array[i];
+                            }
                         }
                         $ul.stop().animate({
                                 'margin-left': mf +'px'
