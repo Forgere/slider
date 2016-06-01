@@ -1,6 +1,6 @@
 (function($){
     // 声明图片
-    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg'];
+    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg'];
     var array=array_remote,arrayindex;
     var silde = {
         init:function(a,number,gundong,status){
@@ -69,6 +69,7 @@
                 if(array.length===0){return;}
                 $("<li><img style='width:"+width+";'></li>").appendTo($ul);
                 $(a).find("img")[$(a).find("img").length-1].src = array.shift();
+                // $(a).find("img").last().src = array.shift();
             }
         },
         auto:function(a,numberaccout,gundongaccout,status){
@@ -81,24 +82,15 @@
                 auto_status = status,
                 mf=parseInt($ul.css('margin-left')),
                 havesend=0;
+                //滚动
                 if(auto_status){
                     timemachine=setInterval(function(){
                         var width = parseInt($(a).parent().css('width'))/numberaccout;
-                        if(-mf<($lis.length-numberaccout)*width){
+                        //滚动限制
+                        if(-mf<($ul.children("li").length-numberaccout)*width){
                             mf = mf -width*gundongaccout;
                         }else{
                             mf = 0;
-                        }
-                        index = -mf/width+numberaccout-1;
-                        if(gundongaccout===1){
-                            if(index>(numberaccout-1)){
-                                $ul.find("img")[index].src=array[index];
-                            }
-                        }else{
-                                for (var i = 0; i < gundongaccout; i++) {
-                                    console.log(i);
-                                    $ul.find("img")[i+numberaccout].src=array[i+numberaccout];
-                                }
                         }
                         $ul.stop().animate({
                                 'margin-left': mf +'px'
