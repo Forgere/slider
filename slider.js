@@ -1,45 +1,38 @@
 (function($){
     // 声明图片
-    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg'];
+    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg'];
     var array=array_remote,arrayindex;
     var silde = {
         init:function(a,number,gundong,status){
-            var linumber= number + 1,
-                $ul = $(a).find("ul"),
-                $lis = $ul.children("li"),
-                mf=parseInt($ul.css('margin-left')),
+            //滚动数量修正
+            gundong=(number<gundong)?number:gundong;
+            var $ul = $(a).find("ul"),
                 gundongaccout = gundong || 1,
                 numberaccout = number || 4,
+                alen = array.length,
                 containWidth = $(a).parent().css('width'),
                 width = parseInt(containWidth)/number,
-                lanumber= $lis.length;
+                _self=this;
             this.pingmu(a,numberaccout,$ul,number);
             $('.arrow-right').click(function(){
-                if(-parseInt($ul.css('margin-left'))>($lis.length-numberaccout-1)*width){
-                    return;
-                }
+                var mf=parseInt($ul.css('margin-left'));
+                if(-mf>=(alen-numberaccout)*width){return;}
                 mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
-                index = -mf/width+number-1;
-                if(gundongaccout===1){
-                    if(index>(numberaccout-1)){
-                        $ul.find("img")[index].src=array[index];
-                    }
-                }else{
-                        for (var i = 0; i < gundongaccout; i++) {
-                            console.log(i);
-                            $ul.find("img")[i+numberaccout].src=array[i+numberaccout];
-                        }
+                if(-mf>(alen-numberaccout)*width){
+                    mf=(numberaccout-alen)*width;
                 }
                 $ul.stop().animate({
                         'margin-left':mf +'px'
                     },
                     'fast');
+                _self.createImg(a,gundongaccout,$ul,numberaccout);
                 });
             $('.arrow-left').click(function(){
                 if(-parseInt($ul.css('margin-left')) < width){
                     return;
                 }
                 mf = parseInt($ul.css('margin-left')) +width*gundongaccout;
+                if(mf>0){ mf = 0;}
                 $ul.stop().animate({
                         'margin-left':mf +'px'
                     },
@@ -77,9 +70,9 @@
             var _root = this,
                 $ul = $(a).find("ul"),
                 $lis = $ul.children("li"),
-                linumber= numberaccout + 1,
                 lanumber= $lis.length,
                 auto_status = status,
+                alen = array.length,
                 mf=parseInt($ul.css('margin-left')),
                 havesend=0;
                 //滚动
@@ -87,9 +80,12 @@
                     timemachine=setInterval(function(){
                         var width = parseInt($(a).parent().css('width'))/numberaccout;
                         //滚动限制
-                        if(-mf<($ul.children("li").length-numberaccout)*width){
-                            mf = mf -width*gundongaccout;
-                        }else{
+                        var mf=parseInt($ul.css('margin-left'));
+                        mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
+                        if(-mf>(alen)*width){
+                            mf=(-alen)*width;
+                        }
+                        if(mf===(-alen)*width){
                             mf = 0;
                         }
                         $ul.stop().animate({
@@ -111,6 +107,6 @@
         }
     };
     $(function(){
-        silde.init('.slider',3,1,true);
+        silde.init('.slider',3,2,true);
     });
 })(jQuery);
