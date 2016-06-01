@@ -1,7 +1,8 @@
 (function($){
     // 声明图片
-    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg'];
-    var array=array_remote,arrayindex;
+    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','5.jpg','6.jpg'];
+    var array=array_remote,arrayindex,
+        arraylength = array.length;
     var silde = {
         init:function(a,number,gundong,status){
             //滚动数量修正
@@ -11,7 +12,7 @@
                 numberaccout = number || 4,
                 alen = array.length,
                 containWidth = $(a).parent().css('width'),
-                width = parseInt(containWidth)/number,
+                width = Math.floor(parseInt(containWidth)/number),
                 _self=this;
             this.pingmu(a,numberaccout,$ul,number);
             $('.arrow-right').click(function(){
@@ -28,7 +29,7 @@
                 _self.createImg(a,gundongaccout,$ul,numberaccout);
                 });
             $('.arrow-left').click(function(){
-                if(-parseInt($ul.css('margin-left')) < width){
+                if(-parseInt($ul.css('margin-left')) < 0){
                     return;
                 }
                 mf = parseInt($ul.css('margin-left')) +width*gundongaccout;
@@ -43,8 +44,8 @@
         },
         pingmu:function(a,numberaccout,$ul,number){
             //父容器自适应宽度
-            var width = parseInt($(a).parent().css('width'))/number;
-            $(a).css({'width':$(a).parent().css('width')});
+            var width = Math.floor(parseInt($(a).parent().css('width'))/number);
+            $(a).css({'width':width*numberaccout});
             for (var j = 0; j < numberaccout; j++) {
                 $("<li><img style='width:"+width+";'></li>").appendTo($ul);
                 $ul.find("img")[j].src = array.shift();
@@ -57,7 +58,7 @@
             });
         },
         createImg:function(a,gundongaccout,$ul,number){
-            var width = parseInt($(a).parent().css('width'))/number;
+            var width = Math.floor(parseInt($(a).parent().css('width'))/number);
             for (var j = 0; j < gundongaccout; j++) {
                 if(array.length===0){return;}
                 $("<li><img style='width:"+width+";'></li>").appendTo($ul);
@@ -72,21 +73,21 @@
                 $lis = $ul.children("li"),
                 lanumber= $lis.length,
                 auto_status = status,
-                alen = array.length,
-                mf=parseInt($ul.css('margin-left')),
+                alen = arraylength - numberaccout,
                 havesend=0;
                 //滚动
                 if(auto_status){
                     timemachine=setInterval(function(){
-                        var width = parseInt($(a).parent().css('width'))/numberaccout;
+                        var width = Math.floor(parseInt($(a).parent().css('width'))/numberaccout);
                         //滚动限制
                         var mf=parseInt($ul.css('margin-left'));
-                        mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
-                        if(-mf>(alen)*width){
-                            mf=(-alen)*width;
-                        }
-                        if(mf===(-alen)*width){
+                        if(mf==(-alen)*width){
                             mf = 0;
+                        }else{
+                            mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
+                            if(-mf>(alen)*width){
+                                mf=(-alen)*width;
+                            }
                         }
                         $ul.stop().animate({
                                 'margin-left': mf +'px'
@@ -107,6 +108,6 @@
         }
     };
     $(function(){
-        silde.init('.slider',3,2,true);
+        silde.init('.slider',3,1,true);
     });
 })(jQuery);
