@@ -1,6 +1,6 @@
 (function($){
     // 声明图片
-    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','5.jpg','6.jpg'];
+    var array_remote=['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg'];
     var array=array_remote,arrayindex,
         arraylength = array.length;
     var silde = {
@@ -27,7 +27,7 @@
                     },
                     'fast');
                 _self.createImg(a,gundongaccout,$ul,numberaccout);
-                });
+            });
             $('.arrow-left').click(function(){
                 if(-parseInt($ul.css('margin-left')) < 0){
                     return;
@@ -45,6 +45,7 @@
         pingmu:function(a,numberaccout,$ul,number){
             //父容器自适应宽度
             var width = Math.floor(parseInt($(a).parent().css('width'))/number);
+            console.log($(a).parent());
             $(a).css({'width':width*numberaccout});
             for (var j = 0; j < numberaccout; j++) {
                 $("<li><img style='width:"+width+";'></li>").appendTo($ul);
