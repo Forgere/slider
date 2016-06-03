@@ -33,8 +33,8 @@
                 $(a).find(de.items).stop().animate({
                         'margin-left': mf +'px'
                     },
-                    'slow');
-                },3000
+                    de.autospeed);
+                },de.duration
             );
         },
         createImg : function(a,de){
@@ -43,7 +43,6 @@
                 if(de.array.length===0){return;}
                 $("<li><img style='width:"+width+";'></li>").appendTo($(a).find(de.items));
                 $(a).find("img")[$(a).find("img").length-1].src = de.array.shift();
-                // $(a).find("img").last().src = array.shift();
             }
         },
         stop : function(){
@@ -65,7 +64,7 @@
             $(a).find(de.items).stop().animate({
                     'margin-left': mf +'px'
                 },
-                'fast');
+                de.speed);
         },
         left : function(a,de){
             if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
@@ -76,7 +75,7 @@
             if(mf>0){ mf = 0;}
             $(a).find(de.items).stop().animate({
                     'margin-left':mf +'px'
-            },'fast');
+            },de.speed);
         },
     };
     var methods = {
@@ -84,12 +83,14 @@
             var de = {
                 number : 4,
                 gundong : 1,
-                status : true,
                 items : 'ul',
                 item : '>li',
-                autoplay: 'true',
-                autochange:'true',
-                // slid : '.slider',
+                autoplay: true,
+                autochange:true,
+                duration:3000,
+                arrow:true,
+                speed:'fast',
+                autospeed:'slow',
                 array : ['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg']
             };
             de = $.extend({},de, o);
@@ -109,21 +110,23 @@
             controls.addimage($el, de );
             if(de.autoplay){
                 controls.autoplay($el,de);
+                //hover
+                $el.hover(function() {
+                    controls.stop();
+                });
+                // 鼠标移开
+                $el.mouseleave(function(){
+                    controls.autoplay($el,de);
+                });
             }
-            //hover
-            $el.hover(function() {
-                controls.stop();
-            });
-            // 鼠标移开
-            $el.mouseleave(function(){
-                controls.autoplay($el,de);
-            });
-            $('.arrow-right').click(function(){
-                controls.right($el, de );
-            });
-            $('.arrow-left').click(function(){
-                controls.left($el, de );
-            });
+            if(de.arrow){
+                $('.arrow-right').click(function(){
+                    controls.right($el, de );
+                });
+                $('.arrow-left').click(function(){
+                    controls.left($el, de );
+                });
+            }
         }
     };
     $.fn.silder = function (method) {
@@ -139,5 +142,28 @@
 })(jQuery);
 //调用init方法
 $(function(){
-    $('.slider').silder({number : 4,gundong:3,array:['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg']});
+    $('.slider').silder({
+        number : 1,         //图数量
+        gundong:1,          //滚动数量
+        autochange:true,    //是否自动适应平铺
+        autoplay:true,      //自动播放
+        arrow:true,         //有箭头
+        duration:3000,      //自动播放时延迟
+        speed:200,          //箭头滚动速度
+        autospeed:'slow',   //自动播放速度
+        //图片url数组
+        array:['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg']});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
