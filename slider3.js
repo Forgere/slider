@@ -1,21 +1,86 @@
 (function ($) {
     var controls = {
-        windowsize : function(a,number){
-            $(a).find('img').css('width', Math.floor($(a).width()/number)+'px');
+        windowsize : function(a,de){
+            var imgWarp = Math.floor(parseInt($(a).parent().css('width'))/de.number)*de.number+'px';
+            var imgW = Math.floor(parseInt($(a).parent().css('width'))/de.number)+'px';
+            $(a).css('width', imgWarp);
+            $(a).find('img').css('width', imgW);
         },
-        addimage : function(a,number,array){
+        addimage : function(a,de){
             //添加初始图片
-            var width = Math.floor($(a).width()/number)+'px';
-            console.log(width);
-            $(a).css({'width':width*number});
-            for (var j = 0; j < number; j++) {
-                $("<li><img src="+array[0]+" style='width:"+width+";'></li>").appendTo($(a).find('ul'));
-                array.shift();
+            var width = Math.floor($(a).width()/de.number)+'px';
+            $(a).css({'width':width*de.number});
+            for (var j = 0; j < de.number; j++) {
+                $("<li><img src="+de.array[0]+" style='width:"+width+";'></li>").appendTo($(a).find(de.items));
+                de.array.shift();
             }
+        },
+        autoplay : function(a,de){
+            var mf=parseInt($(a).find(de.items).css('margin-left'));
+            timemachine=setInterval(function(){
+                controls.createImg(a,de);
+                var alen = $(a).find(de.items).children('li').length-de.number;
+                var width = Math.floor(parseInt($(a).parent().width())/de.number);
+                //滚动限制
+                if(mf==(-alen)*width){
+                    mf = 0;
+                }else{
+                    mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
+                    if(-mf>(alen)*width){
+                        mf=(-alen)*width;
+                    }
+                }
+                $(a).find(de.items).stop().animate({
+                        'margin-left': mf +'px'
+                    },
+                    'slow');
+                },3000
+            );
+        },
+        createImg : function(a,de){
+            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
+            for (var j = 0; j < de.gundong; j++) {
+                if(de.array.length===0){return;}
+                $("<li><img style='width:"+width+";'></li>").appendTo($(a).find(de.items));
+                $(a).find("img")[$(a).find("img").length-1].src = de.array.shift();
+                // $(a).find("img").last().src = array.shift();
+            }
+        },
+        stop : function(){
+            window.clearInterval(timemachine);
+        },
+        right : function(a,de){
+            var mf=parseInt($(a).find(de.items).css('margin-left'));
+            var width = Math.floor(parseInt($(a).parent().width())/de.number);
+            controls.createImg(a,de);
+            var alen = $(a).find(de.items).children('li').length-de.number;
+            if(mf==(-alen)*width){
+                mf = 0;
+            }else{
+                mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
+                if(-mf>(alen)*width){
+                    mf=(-alen)*width;
+                }
+            }
+            $(a).find(de.items).stop().animate({
+                    'margin-left': mf +'px'
+                },
+                'fast');
+        },
+        left : function(a,de){
+            if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
+                return;
+            }
+            var width = Math.floor(parseInt($(a).parent().width())/de.number);
+            mf = parseInt($(a).find(de.items).css('margin-left')) +width*de.gundong;
+            if(mf>0){ mf = 0;}
+            $(a).find(de.items).stop().animate({
+                    'margin-left':mf +'px'
+            },'fast');
         },
     };
     var methods = {
-        init: function (el,o) {
+        init: function (o) {
             var de = {
                 number : 4,
                 gundong : 1,
@@ -29,69 +94,36 @@
             };
             de = $.extend({},de, o);
             var $el= $(this),
-                $ul= $el.find(de.items),
-                cache= {};
+                $ul= $el.find(de.items);
+            var parentW =  Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number+'px';
+            $el.css({
+                overflow: 'hidden',
+                width : parentW,
+            });
             if(de.autochange){
                 $(window).resize(function() {
                     /* Act on the event */
-                    controls.windowsize($el, de.number);
+                    controls.windowsize($el, de );
                 });
             }
-            // for (var j = 0; j < de.number; j++) {
-            //     width =  Math.floor($(this).width()/de.number)+'px';
-            //     $("<li><img style='width:"+width+";'></li>").appendTo($(de.slid));
-            //     $(de.slid).find("img")[j].src = de.array.shift();
-            // }
-            controls.addimage($el, de.number,de.array);
-        },
-        createImg : function(ele){
-            var width = Math.floor(parseInt($(a).parent().css('width'))/number);
-            for (var j = 0; j < gundongaccout; j++) {
-                if(array.length===0){return;}
-                $("<li><img style='width:"+width+";'></li>").appendTo($ul);
-                $(a).find("img")[$(a).find("img").length-1].src = array.shift();
-                // $(a).find("img").last().src = array.shift();
+            controls.addimage($el, de );
+            if(de.autoplay){
+                controls.autoplay($el,de);
             }
-        },
-        auto : function(a,numberaccout,gundongaccout,status){
-            //slider效果
-            var _root = this,
-                $ul = $(a).find("ul"),
-                $lis = $ul.children("li"),
-                lanumber= $lis.length,
-                auto_status = status,
-                alen = arraylength - numberaccout,
-                havesend=0;
-                //滚动
-                if(auto_status){
-                    timemachine=setInterval(function(){
-                        var width = Math.floor(parseInt($(a).parent().css('width'))/numberaccout);
-                        //滚动限制
-                        var mf=parseInt($ul.css('margin-left'));
-                        if(mf==(-alen)*width){
-                            mf = 0;
-                        }else{
-                            mf = parseInt($ul.css('margin-left')) -width*gundongaccout;
-                            if(-mf>(alen)*width){
-                                mf=(-alen)*width;
-                            }
-                        }
-                        $ul.stop().animate({
-                                'margin-left': mf +'px'
-                            },
-                            'slow');
-                        _root.createImg(a,gundongaccout,$ul,numberaccout);
-                        },3000
-                    );
-                    // 接触时暂停
-                    $('.slider').hover(function(){
-                        window.clearInterval(timemachine);
-                    });
-                    // 鼠标移开
-                    $('.slider').mouseleave(function(){
-                        silde.auto(a,numberaccout,gundongaccout,status);
-                    });
-                }
+            //hover
+            $el.hover(function() {
+                controls.stop();
+            });
+            // 鼠标移开
+            $el.mouseleave(function(){
+                controls.autoplay($el,de);
+            });
+            $('.arrow-right').click(function(){
+                controls.right($el, de );
+            });
+            $('.arrow-left').click(function(){
+                controls.left($el, de );
+            });
         }
     };
     $.fn.silder = function (method) {
@@ -107,5 +139,5 @@
 })(jQuery);
 //调用init方法
 $(function(){
-    $('.slider').silder();
+    $('.slider').silder({number : 4,gundong:3,array:['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg']});
 });

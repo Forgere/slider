@@ -44,6 +44,7 @@
         },
         pingmu:function(a,numberaccout,$ul,number){
             //父容器自适应宽度
+            $(a).css('width', $(a).parent().css('width'));
             var width = Math.floor(parseInt($(a).parent().css('width'))/number);
             console.log($(a).parent());
             $(a).css({'width':width*numberaccout});
