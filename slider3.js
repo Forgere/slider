@@ -8,7 +8,7 @@
         },
         addimage : function(a,de){
             //添加初始图片
-            var width = Math.floor($(a).width()/de.number)+'px';
+            var width = de.parentW/de.number+'px';
             $(a).css({'width':width*de.number});
             $(a).find(de.items).css({'width':width*de.number});
             for (var j = 0; j < de.savenumber; j++) {
@@ -22,7 +22,7 @@
                 controls.getArray(a,de);
                 controls.createImg(a,de);
                 var alen = $(a).find(de.items).children('li').length-de.number;
-                var width = Math.floor(parseInt($(a).parent().width())/de.number);
+                var width = de.parentW/de.number;
                 //滚动限制
                 if(de.mf==(-alen)*width){
                     if (!de.savenumber){
@@ -42,7 +42,7 @@
             );
         },
         createImg : function(a,de){
-            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
+            var width = de.parentW/de.number;
             for (var j = 0; j < de.gundong; j++) {
                 if(de.array.length===0){return;}
                 $("<li><img style='width:"+width+";'></li>").appendTo($(a).find(de.items));
@@ -58,7 +58,7 @@
                 return;
             }
             console.log(de.indx);
-            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number)*de.number;
+            var width = de.parentW/de.number;
             var alen = $(a).find(de.items).children('li').length-de.number;
             de.beign = 0;
             //图片最右边靠最右边
@@ -80,7 +80,7 @@
                 de.speed);
         },
         getArray: function(a,de){
-            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
+            var width = de.parentW/de.number;
             //初始化图片地址数组
             if(de.indx === 0 ){
                 de.array=romoteArray.slice(de.indx, de.indx + de.savenumber);
@@ -99,7 +99,7 @@
         deleteImg:function(a,de){
             var liarray = $(a).find(de.items).find(de.item);
             var lilength = $(a).find(de.items).find(de.item).length;
-            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
+            var width = de.parentW/de.number;
             // if(lilength===de.savenumber){
                 for (var i = 0; i < de.gundong; i++) {
                     de.cache.push(liarray.eq(i).find('img')[0].src);
@@ -113,7 +113,7 @@
             if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
                 return;
             }
-            var width = Math.floor(parseInt($(a).parent().width())/de.number);
+            var width = de.parentW/de.number;
             de.mf = parseInt($(a).find(de.items).css('margin-left')) +width*de.gundong;
             if(de.mf>0){
                 de.mf = 0;
@@ -125,7 +125,7 @@
         },
         leftadd:function(a,de){
             var liarray = $(a).find(de.items).find(de.item);
-            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
+            var width = de.parentW/de.number;
             if(de.savenumber){
                 if(de.cache.length!==0){
                     if (parseInt($(a).find(de.items).css('margin-left'))===0) {
@@ -168,6 +168,7 @@
             var $el= $(this),
                 $ul= $el.find(de.items);
             var parentW =  Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number+'px';
+            de.parentW = Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number;
             $el.css({
                 overflow: 'hidden',
                 width : parentW,
@@ -215,7 +216,7 @@
 $(function(){
     romoteArray = ['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg'];
     $('.slider').silder({
-        number : 1,         //图数量
+        number : 3,         //图数量
         gundong:1,          //滚动数量
         savenumber: 6,      //保存数量为number整数倍 不保存null，保存时回滚关闭
         autochange:true,    //是否自动适应平铺
