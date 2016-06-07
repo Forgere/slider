@@ -11,32 +11,31 @@
             var width = Math.floor($(a).width()/de.number)+'px';
             $(a).css({'width':width*de.number});
             $(a).find(de.items).css({'width':width*de.number});
-            console.log(de.array);
             for (var j = 0; j < de.savenumber; j++) {
                 $("<li><img src="+de.array[0]+" style='width:"+width+";'></li>").appendTo($(a).find(de.items));
                 de.array.shift();
             }
         },
         autoplay : function(a,de){
-            var mf=parseInt($(a).find(de.items).css('margin-left'));
+            de.mf=parseInt($(a).find(de.items).css('margin-left'));
             timemachine=setInterval(function(){
                 controls.getArray(a,de);
                 controls.createImg(a,de);
                 var alen = $(a).find(de.items).children('li').length-de.number;
                 var width = Math.floor(parseInt($(a).parent().width())/de.number);
                 //滚动限制
-                if(mf==(-alen)*width){
+                if(de.mf==(-alen)*width){
                     if (!de.savenumber){
-                        mf = 0;
+                        de.mf = 0;
                     }
                 }else{
-                    mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
-                    if(-mf>(alen)*width){
-                        mf=(-alen)*width;
+                    de.mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
+                    if(-de.mf>(alen)*width){
+                        de.mf=(-alen)*width;
                     }
                 }
                 $(a).find(de.items).stop().animate({
-                        'margin-left': mf +'px'
+                        'margin-left': de.mf +'px'
                     },
                     de.autospeed);
                 },de.duration
@@ -55,10 +54,11 @@
         },
         right : function(a,de){
             //访问到最后一个退出
-            if(romoteArray.length===de.indx){
+            if(de.reach ===1){
                 return;
             }
-            var width = Math.floor(parseInt($(a).parent().width())/de.number);
+            console.log(de.indx);
+            var width = Math.floor(parseInt($(a).parent().css('width'))/de.number)*de.number;
             var alen = $(a).find(de.items).children('li').length-de.number;
             de.beign = 0;
             //图片最右边靠最右边
@@ -66,30 +66,18 @@
                  de.begin = 1;
             }
             if (de.begin===1) {
-                $(a).find(de.items).css('margin-left', (de.number-de.savenumber+1)*width);
                 controls.getArray(a,de);
+                if(de.reach ===1){
+                    return;
+                }
+                $(a).find(de.items).css('margin-left', (de.number-de.savenumber+de.gundong)*width);
                 controls.createImg(a,de);
             }
-            mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
-            console.log(de.indx);
+            de.mf = parseInt($(a).find(de.items).css('margin-left')) -width*(de.gundong);
             $(a).find(de.items).stop().animate({
-                    'margin-left': mf +'px'
+                    'margin-left': de.mf +'px'
                 },
                 de.speed);
-        },
-        left : function(a,de){
-            controls.leftadd(a,de);
-            if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
-                return;
-            }
-            var width = Math.floor(parseInt($(a).parent().width())/de.number);
-            mf = parseInt($(a).find(de.items).css('margin-left')) +width*de.gundong;
-            if(mf>0){
-                mf = 0;
-            }
-            $(a).find(de.items).stop().animate({
-                    'margin-left':mf +'px'
-            },de.speed);
         },
         getArray: function(a,de){
             var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
@@ -103,6 +91,8 @@
                     de.array = romoteArray.slice(de.indx,de.indx+de.gundong);
                     de.indx += de.gundong;
                     controls.deleteImg(a,de);
+                }else{
+                    de.reach = 1;
                 }
             }
         },
@@ -117,6 +107,22 @@
                 }
             // }
         },
+        left : function(a,de){
+            de.reach = 0;
+            controls.leftadd(a,de);
+            if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
+                return;
+            }
+            var width = Math.floor(parseInt($(a).parent().width())/de.number);
+            de.mf = parseInt($(a).find(de.items).css('margin-left')) +width*de.gundong;
+            if(de.mf>0){
+                de.mf = 0;
+            }
+            console.log(de.mf);
+            $(a).find(de.items).stop().animate({
+                    'margin-left':de.mf +'px'
+            },de.speed);
+        },
         leftadd:function(a,de){
             var liarray = $(a).find(de.items).find(de.item);
             var width = Math.floor(parseInt($(a).parent().css('width'))/de.number);
@@ -128,7 +134,8 @@
                             $("<li><img style='width:"+width+";'></li>").prependTo($(a).find(de.items));
                             $(a).find("img")[0].src = de.cache.pop();
                             $(a).find(de.items).find(de.item).eq($(a).find(de.items).find(de.item).length-1).remove();
-                            // de.indx -= de.gundong ;
+                            de.indx -= de.gundong ;
+                            console.log(de.indx);
                         }
                     }
                 }
@@ -154,12 +161,12 @@
                 cache:[],
             };
             de = $.extend({},de, o);
+            de.mf=0;
             if (de.array.length===0) {
                 controls.getArray($el,de);
             }
             var $el= $(this),
                 $ul= $el.find(de.items);
-            de.romoteArray = romoteArray;
             var parentW =  Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number+'px';
             $el.css({
                 overflow: 'hidden',
@@ -208,7 +215,7 @@
 $(function(){
     romoteArray = ['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg'];
     $('.slider').silder({
-        number : 3,         //图数量
+        number : 1,         //图数量
         gundong:1,          //滚动数量
         savenumber: 6,      //保存数量为number整数倍 不保存null，保存时回滚关闭
         autochange:true,    //是否自动适应平铺
