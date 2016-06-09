@@ -6,6 +6,7 @@ ul{
 	width: 20000px;
 	padding-left: 0;
 	position: relative;
+	margin: 0 auto;
 }
 li{
 	position: absolute;

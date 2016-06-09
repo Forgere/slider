@@ -54,7 +54,7 @@
                 //余下图片小余滚动数值时
                 var getArrayLength = (de.array.length < de.gundong) ? de.array.length : de.gundong;
                 for (var j = 0; j < getArrayLength; j++) {
-                    $("<li><img style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
+                    $("<li style='left:"+(de.imageindex-1)*de.parentW / de.number+'px'+"'><img style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
                     $(a).find("img")[$(a).find("img").length - 1].src = de.array.shift();
                 }
             } else {
@@ -75,16 +75,34 @@
         right: function (a, de) {
             var width = de.parentW / de.number;
             var parentLeft = $(a).offset().left;
-            controls.getArray(a, de);
             var getArrayLength = (de.array.length < de.gundong) ? de.array.length : de.gundong;
-            controls.createImg(a, de);
+            var lastLiImageIndex = parseInt($(a).find(de.items).children('li').last().css('left'))/width+1;
+            console.log(lastLiImageIndex);
             de.mf = parseInt($(a).find(de.items).css('margin-left')) - width * (getArrayLength);
             if(!de.savenumber){
                 if (-de.mf > width * (de.imageindex - de.number)) {
                     de.mf = -width * (de.imageindex - de.number);
                 }
+                controls.getArray(a, de);
+                controls.createImg(a, de);
             }else{
+                if (lastLiImageIndex === de.imageindex) {
+                    controls.getArray(a, de);
+                    controls.createImg(a, de);
+                    de.mf -= width*de.gundong;
+                    if (-de.mf > width * (de.imageindex - de.number)) {
+                        de.mf = -width * (de.imageindex - de.number);
+                    }
+                }else{
+                    de.mf -= width*de.gundong;
+                    de.imageindex += de.gundong;
+                }
+                // if(lastLiImageIndex-de.savenumber > de.imageindex){
+                //     //
+                //     console.log(1);
+                // }else{
 
+                // }
             }
             $(a).find(de.items).stop().animate({
                     'margin-left': de.mf + 'px'
@@ -94,15 +112,26 @@
         },
         //往左
         left: function (a, de) {
+            var width = de.parentW / de.number;
             de.imageindex -= de.gundong;
             de.imageindex = (de.imageindex < de.number) ? de.number : de.imageindex;
             if (-parseInt($(a).find(de.items).css('margin-left')) < 0) {
                 return;
             }
-            var width = de.parentW / de.number;
             de.mf = parseInt($(a).find(de.items).css('margin-left')) + width * de.gundong;
             if (de.mf > 0) {
                 de.mf = 0;
+            }
+            if (de.savenumber) {
+                if(de.cacheArray.length !== 0){
+                    if (de.number+de.savenumber<=de.imageindex){
+                        for (var i = 0; i < de.gundong; i++) {
+                            $("<li style='left:"+(de.imageindex-de.number-de.savenumber)*de.parentW / de.number+'px'+"'><img style='width:" + width + ";'></li>").prependTo($(a).find(de.items));
+                            $(a).find("img")[0].src = de.cacheArray[de.imageindex-de.number-de.savenumber];
+                            de.cacheArray[de.imageindex-de.number-de.savenumber] = null;
+                        }
+                    }
+                }
             }
             $(a).find(de.items).stop().animate({
                 'margin-left': de.mf + 'px'
@@ -140,7 +169,7 @@
                 width: parentW,
             });
 
-            // keep.recovery($el, de);
+            keep.recovery($el, de);
             if (de.autochange) {
                 $(window).resize(function () {
                     /* Act on the event */
@@ -148,7 +177,7 @@
                 });
             }
             controls.addimage($el, de);
-             console.log($ul.height('300px'));
+            $ul.height('300px');
             if (de.autoplay) {
                 controls.autoplay($el, de);
                 //hover
@@ -173,29 +202,31 @@
     var keep = {
         recovery: function (a, de) {
             if (de.savenumber) {
-                var beforeImageIndex = Math.ceil((de.savenumber - de.number) / 2),
-                    liCurrentLength = $(a).find(de.items).children('li').length,
-                    width = de.parentW / de.number;
-                de.cacheArray = [];
-                recoveryTime = setInterval(function () {
+                    de.cacheArray = [];
                     var ulCurrentMl = $(a).find(de.items).css('margin-left');
-                    if (de.savenumber < $(a).find(de.items).children('li').length) {
-                        for (var i = 0; i < de.savenumber - de.number - beforeImageIndex; i++) {
-                            if (de.savenumber >= $(a).find(de.items).children('li').length) {
-                                return;
+                    recoveryTime = setInterval(function(){
+                    var lastImageIndex = parseInt($(a).find(de.items).children('li').last().css('left'))/(de.parentW / de.number) + 1;
+                    //删除前面
+                        if(de.savenumber < de.imageindex-de.number){
+                            for (var i = 0; i < de.imageindex-de.number-de.savenumber; i++) {
+                                // console.log(i);
+                                if(!de.cacheArray[i]){
+                                    de.cacheArray[i] = $(a).find(de.items).children('li').eq(0).find('img')[0].src;
+                                    $(a).find(de.items).children('li').eq(0).remove();
+                                }
+                                console.log(de.cacheArray);
                             }
-                            console.log($(a).find(de.items).children('li').eq(i).find('img')[0].src);
-                            de.cacheArray.push($(a).find(de.items).children('li').eq(i).find('img')[0].src);
-                            console.log(de.cacheArray);
-                            $(a).find(de.items).children('li').eq(i).remove();
-                            $(a).find(de.items).css('margin-left', parseInt(ulCurrentMl)+width+'px');
-                            // if (de.savenumber >= $(a).find(de.items).children('li').length) {
-                            //     return;
-                            // }
-                            // $(a).find(de.items).children('li').eq(liCurrentLength - i).remove();
                         }
-                    }
-                }, 5000);
+                        //删除后面
+                        if (lastImageIndex > de.imageindex + de.savenumber) {
+                            for(var j = 0; j < lastImageIndex - (de.imageindex + de.savenumber);j++){
+                                console.log(j);
+                                de.cacheArray[lastImageIndex - 1] = $(a).find(de.items).children('li').last().find('img')[0].src;
+                                $(a).find(de.items).children('li').last().remove();
+                                console.log(de.cacheArray);
+                            }
+                        }
+                    },5000);
             }
         }
     };
@@ -221,7 +252,7 @@ $(function () {
     $('.slider').silder({
         number: 3, //图数量
         gundong: 1, //滚动数量
-        savenumber: 6, //保存数量为number整数倍
+        savenumber: 2, //显示前后保存的数据
         autochange: true, //是否自动适应平铺
         autoplay: false, //自动播放
         arrow: true, //有箭头
