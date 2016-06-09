@@ -1,240 +1,219 @@
-(function ($) {
-    var controls = {
-        windowsize : function(a,de){
-            var imgWarp = Math.floor(parseInt($(a).parent().css('width'))/de.number)*de.number+'px';
-            var imgW = Math.floor(parseInt($(a).parent().css('width'))/de.number)+'px';
-            $(a).css('width', imgWarp);
-            $(a).find('img').css('width', imgW);
-        },
-        addimage : function(a,de){
-            //添加初始图片
-            var width = de.parentW/de.number+'px';
-            $(a).css({'width':width*de.number});
-            $(a).find(de.items).css({'width':width*de.number});
-            for (var j = 0; j < de.savenumber; j++) {
-                $("<li><img src="+de.array[0]+" style='width:"+width+";'></li>").appendTo($(a).find(de.items));
-                de.array.shift();
+(function($) {
+    var Slider = function() {
+        //  保存对象
+        var _ = this;
+
+        //  默认参数
+        _.o = {
+            imageindex: 0,
+            number: 4,
+            gundong: 1,
+            savenumber: null,
+            items: '>ul',
+            item: '>li',
+            autoplay: true,
+            loop : false,
+            autochange: true,
+            duration: 3000,
+            arrows: true,
+            prev: '&larr;',
+            next: '&rarr;',
+            speed: 500,
+            autospeed: 'slow',
+            array: [],
+            cache: [],
+            easing: 'swing',
+            loading: 'loading.gif'
+        };
+
+        _.init = function(el, o) {
+            //  信息合并
+            _.o = $.extend(_.o, o);
+
+            _.el = el;
+            _.ul = el.find(_.o.items);
+            _.li = _.ul.find(_.o.item);
+            _.parentW = Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number;
+            _.liWidth = _.parentW / _.o.number;
+            console.log(_.parentW);
+            //  当前图片index
+            _.i = 0;
+
+            //初始加赞图片
+            _.o.array = romoteArray.slice(_.i, _.i + _.o.number);
+            for (var i = 0; i < _.o.number; i++) {
+                $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + _.o.array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
+                _.i++;
+                //清空数组
+                _.o.array.shift();
             }
-        },
-        autoplay : function(a,de){
-            de.mf=parseInt($(a).find(de.items).css('margin-left'));
-            timemachine=setInterval(function(){
-                controls.getArray(a,de);
-                controls.createImg(a,de);
-                var alen = $(a).find(de.items).children('li').length-de.number;
-                var width = de.parentW/de.number;
-                //滚动限制
-                if(de.mf==(-alen)*width){
-                    if (!de.savenumber){
-                        de.mf = 0;
+            //高度
+            _.ul.height('100%');
+            //  Autoslide
+            _.o.autoplay && setTimeout(function() {
+                if (_.o.duration | 0) {
+                    if(_.o.autoplay){
+                        _.play();
                     }
-                }else{
-                    de.mf = parseInt($(a).find(de.items).css('margin-left')) -width*de.gundong;
-                    if(-de.mf>(alen)*width){
-                        de.mf=(-alen)*width;
-                    }
+                    _.el.on('mouseover mouseout', function(e) {
+                        _.stop();
+                        _.o.autoplay && e.type == 'mouseout' && _.play();
+                    });
                 }
-                $(a).find(de.items).stop().animate({
-                        'margin-left': de.mf +'px'
-                    },
-                    de.autospeed);
-                },de.duration
-            );
-        },
-        createImg : function(a,de){
-            var width = de.parentW/de.number;
-            for (var j = 0; j < de.gundong; j++) {
-                if(de.array.length===0){return;}
-                $("<li><img style='width:"+width+";'></li>").appendTo($(a).find(de.items));
-                $(a).find("img")[$(a).find("img").length-1].src = de.array.shift();
+            }, 0);
+            //  Dot pagination
+            o.dots && nav('dot');
+
+            //  Arrows support
+            if(o.arrows){
+                nav('arrow');
             }
-        },
-        stop : function(){
-            window.clearInterval(timemachine);
-        },
-        right : function(a,de){
-            //访问到最后一个退出
-            if(de.reach ===1){
-                return;
-            }
-            console.log(de.indx);
-            var width = de.parentW/de.number;
-            var alen = $(a).find(de.items).children('li').length-de.number;
-            de.beign = 0;
-            //图片最右边靠最右边
-            if ($(a).find(de.items).css('margin-left')===(de.number-de.savenumber)*width+'px') {
-                 de.begin = 1;
-            }
-            if (de.begin===1) {
-                controls.getArray(a,de);
-                if(de.reach ===1){
-                    return;
-                }
-                $(a).find(de.items).css('margin-left', (de.number-de.savenumber+de.gundong)*width);
-                controls.createImg(a,de);
-            }
-            de.mf = parseInt($(a).find(de.items).css('margin-left')) -width*(de.gundong);
-            $(a).find(de.items).stop().animate({
-                    'margin-left': de.mf +'px'
-                },
-                de.speed);
-        },
-        getArray: function(a,de){
-            var width = de.parentW/de.number;
-            //初始化图片地址数组
-            if(de.indx === 0 ){
-                de.array=romoteArray.slice(de.indx, de.indx + de.savenumber);
-                de.indx += de.savenumber;
-            }else{
-                //排布已经取得的图片地址，远程图片取完则不再取
-                if (romoteArray[de.indx]) {
-                    de.array = romoteArray.slice(de.indx,de.indx+de.gundong);
-                    de.indx += de.gundong;
-                    controls.deleteImg(a,de);
-                }else{
-                    de.reach = 1;
-                }
-            }
-        },
-        deleteImg:function(a,de){
-            var liarray = $(a).find(de.items).find(de.item);
-            var lilength = $(a).find(de.items).find(de.item).length;
-            var width = de.parentW/de.number;
-            // if(lilength===de.savenumber){
-                for (var i = 0; i < de.gundong; i++) {
-                    de.cache.push(liarray.eq(i).find('img')[0].src);
-                    liarray.eq(i).remove();
-                }
-            // }
-        },
-        left : function(a,de){
-            de.reach = 0;
-            controls.leftadd(a,de);
-            if(-parseInt($(a).find(de.items).css('margin-left')) < 0){
-                return;
-            }
-            var width = de.parentW/de.number;
-            de.mf = parseInt($(a).find(de.items).css('margin-left')) +width*de.gundong;
-            if(de.mf>0){
-                de.mf = 0;
-            }
-            console.log(de.mf);
-            $(a).find(de.items).stop().animate({
-                    'margin-left':de.mf +'px'
-            },de.speed);
-        },
-        leftadd:function(a,de){
-            var liarray = $(a).find(de.items).find(de.item);
-            var width = de.parentW/de.number;
-            if(de.savenumber){
-                if(de.cache.length!==0){
-                    if (parseInt($(a).find(de.items).css('margin-left'))===0) {
-                        $(a).find(de.items).css('margin-left',-de.gundong*width+'px');
-                        for (var i = 0; i < de.gundong; i++) {
-                            $("<li><img style='width:"+width+";'></li>").prependTo($(a).find(de.items));
-                            $(a).find("img")[0].src = de.cache.pop();
-                            $(a).find(de.items).find(de.item).eq($(a).find(de.items).find(de.item).length-1).remove();
-                            de.indx -= de.gundong ;
-                            console.log(de.indx);
-                        }
-                    }
-                }
-            }
-        }
-    };
-    var methods = {
-        init: function (o) {
-            var de = {
-                indx: 0,
-                number : 4,
-                gundong : 1,
-                savenumber: null,
-                items : 'ul',
-                item : '>li',
-                autoplay: true,
-                autochange:true,
-                duration:3000,
-                arrow:true,
-                speed:'fast',
-                autospeed:'slow',
-                array : [],
-                cache:[],
-            };
-            de = $.extend({},de, o);
-            de.mf=0;
-            if (de.array.length===0) {
-                controls.getArray($el,de);
-            }
-            var $el= $(this),
-                $ul= $el.find(de.items);
-            var parentW =  Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number+'px';
-            de.parentW = Math.floor(parseInt($el.parent().css('width'))/de.number)*de.number;
-            $el.css({
-                overflow: 'hidden',
-                width : parentW,
-            });
-            if(de.autochange){
+            //  Patch for fluid-width sliders. Screw those guys.
+            if (o.fluid) {
                 $(window).resize(function() {
-                    /* Act on the event */
-                    controls.windowsize($el, de );
+                    _.r && clearTimeout(_.r);
+
+                    _.r = setTimeout(function() {
+                        var styl = {},
+                        // var styl = {height: li.eq(_.i).outerHeight()},
+                        width = el.width();
+                        ul.css(styl);
+                        styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
+                        el.css(styl);
+                        li.css({ width: el[0].getBoundingClientRect().width });
+                    }, 50);
+                }).resize();
+            };
+            return _;
+        };
+
+        //  根据_.i移动ul
+        _.to = function(index, callback) {
+            if (_.t) {
+                _.stop();
+                _.play();
+                    }
+            var o = _.o,
+                el = _.el,
+                ul = _.ul,
+                li = _.li,
+                current = _.i,
+                target = romoteArray[index];
+                console.log(_.i);
+            //  slider到达边缘条件
+            if ((romoteArray.length+1 === _.i) && o.loop === false) {
+                _.i = index;
+                return;
+            }
+            if (index < _.o.number && o.loop === false) {
+                _.i = _.o.number;
+                return;}
+
+            //  无线循环
+            // if (romoteArray.length === _.i) index = 0;
+            // if (index < 0) index = romoteArray.length - 1;
+            // target = li.eq(index);
+
+            var speed = callback ? 5 : o.speed | 0,
+                easing = o.easing,
+                obj = {};
+                // obj = {height: target.outerHeight()};
+
+            if (!ul.queue('fx').length) {
+                //  Handle those pesky dots
+                // el.find('.dot').eq(index).addClass('active').siblings().removeClass('active');
+
+                el.animate(obj, speed, easing) && ul.animate($.extend({left: (_.o.number-index)*_.liWidth}, obj), speed, easing, function(data) {
+                    _.i = index;
+                    console.log(_.i);
                 });
             }
-            controls.addimage($el, de );
-            if(de.autoplay){
-                controls.autoplay($el,de);
-                //hover
-                $el.hover(function() {
-                    controls.stop();
-                });
-                // 鼠标移开
-                $el.mouseleave(function(){
-                    controls.autoplay($el,de);
-                });
+        };
+
+        //  自动增加index
+        _.play = function() {
+            _.t = setInterval(function() {
+                _.to(_.i + 1);
+            }, _.o.duration | 0);
+        };
+
+        //  Stop
+        _.stop = function() {
+            _.t = clearInterval(_.t);
+            return _;
+        };
+
+        //  右箭头
+        _.next = function() {
+            if ( romoteArray.length === _.i) return;
+            _.getArray(_.i,_.i + 1);
+            _.addImage(_.o.array);
+            return _.stop().to(_.i + 1);
+        };
+        //  左箭头
+        _.prev = function() {
+            if ( _.o.number === _.i) return;
+            return _.stop().to(_.i - 1);
+        };
+        //获取数据
+        _.getArray = function(from,to){
+            _.o.array = romoteArray.slice(from, to);
+            return _.o.array;
+        };
+        //加入图片
+        _.addImage = function(array){
+            $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
+            array.shift();
+        };
+        //  Create dots and arrows
+        function nav(name, html) {
+                console.log(name);
+            if (name == 'dot') {
+                html = '<ol class="dots">';
+                    $.each(_.li, function(index) {
+                        html += '<li class="' + (index == _.i ? name + ' active' : name) + '">' + ++index + '</li>';
+                    });
+                html += '</ol>';
+            } else {
+                html = '<div class="';
+                html = html + name + 's">' + html + name + ' prev">' + _.o.prev + '</div>' + html + name + ' next">' + _.o.next + '</div></div>';
             }
-            if(de.arrow){
-                $('.arrow-right').click(function(){
-                    controls.right($el, de );
-                });
-                $('.arrow-left').click(function(){
-                    controls.left($el, de );
-                });
-            }
+
+            _.el.addClass('has-' + name + 's').append(html).find('.' + name).click(function() {
+                var me = $(this);
+                me.hasClass('dot') ? _.stop().to(me.index()) : me.hasClass('prev') ? _.prev() : _.next();
+            });
         }
     };
-    $.fn.silder = function (method) {
-        // 方法调用
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || !method) {
-            methods.init.apply(this, arguments);
-        } else {
-            $.error('Method' + method + 'does not exist on jQuery.silder');
-        }
+
+    //  Create a jQuery plugin
+    $.fn.silder = function(o) {
+        var len = this.length;
+
+        //  Enable multiple-slider support
+        return this.each(function(index) {
+            //  Cache a copy of $(this), so it
+            var me = $(this),
+                key = 'unslider' + (len > 1 ? '-' + ++index : ''),
+                instance = (new Slider).init(me, o);
+
+            //  Invoke an Unslider instance
+            me.data(key, instance).data('key', key);
+        });
     };
+
 })(jQuery);
-//调用init方法
-$(function(){
-    romoteArray = ['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','1.jpg','2.jpg','3.jpg'];
+$(function () {
+    romoteArray = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '1.jpg', '2.jpg', '3.jpg'];
     $('.slider').silder({
-        number : 3,         //图数量
-        gundong:1,          //滚动数量
-        savenumber: 6,      //保存数量为number整数倍 不保存null，保存时回滚关闭
-        autochange:true,    //是否自动适应平铺
-        autoplay:false,      //自动播放
-        arrow:true,         //有箭头
-        duration:3000,      //自动播放时延迟
-        speed:200,          //箭头滚动速度
-        autospeed:'slow',   //自动播放速度
+        number: 1, //图数量
+        savenumber: 3, //显示前后保存的数据
+        autochange: true, //是否自动适应平铺
+        autoplay: false, //自动播放
+        arrows: true, //有箭头
+        duration: 3000, //自动播放时延迟
+        speed: 200, //箭头滚动速度
+        autospeed: 'slow', //自动播放速度
+        loading: null
+    });
 });
-});
-
-
-
-
-
-
-
-
-
-
-

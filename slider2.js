@@ -27,7 +27,9 @@
                         de.imageindex += de.gundong;
                     }
                 } else {
-                    de.array = [];
+                    if (!de.savenumber) {
+                        de.array = [];
+                    }
                 }
             }
         },
@@ -42,8 +44,8 @@
                 'width': width * de.number
             });
             for (var i = 0; i < de.number; i++) {
-                $("<li style='left:"+de.imageindex*de.parentW / de.number+'px'+"'><img src=" + de.array[0] + " style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
-                de.imageindex ++;
+                $("<li style='left:" + de.imageindex * de.parentW / de.number + 'px' + "'><img src=" + de.array[0] + " style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
+                de.imageindex++;
                 de.array.shift();
             }
         },
@@ -54,7 +56,7 @@
                 //余下图片小余滚动数值时
                 var getArrayLength = (de.array.length < de.gundong) ? de.array.length : de.gundong;
                 for (var j = 0; j < getArrayLength; j++) {
-                    $("<li style='left:"+(de.imageindex-1)*de.parentW / de.number+'px'+"'><img style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
+                    $("<li style='left:" + (de.imageindex - de.gundong + j) * de.parentW / de.number + 'px' + "'><img style='width:" + width + ";'></li>").appendTo($(a).find(de.items));
                     $(a).find("img")[$(a).find("img").length - 1].src = de.array.shift();
                 }
             } else {
@@ -76,30 +78,28 @@
             var width = de.parentW / de.number;
             var parentLeft = $(a).offset().left;
             var getArrayLength = (de.array.length < de.gundong) ? de.array.length : de.gundong;
-            var lastLiImageIndex = parseInt($(a).find(de.items).children('li').last().css('left'))/width+1;
-            console.log(lastLiImageIndex);
+            var lastLiImageIndex = parseInt($(a).find(de.items).children('li').last().css('left')) / width + 1;
             de.mf = parseInt($(a).find(de.items).css('margin-left')) - width * (getArrayLength);
-            if(!de.savenumber){
-                if (-de.mf > width * (de.imageindex - de.number)) {
+            if (!de.savenumber) {
+                if (-de.mf < width * (de.imageindex - de.number)) {
                     de.mf = -width * (de.imageindex - de.number);
                 }
                 controls.getArray(a, de);
                 controls.createImg(a, de);
-            }else{
+            } else {
                 if (lastLiImageIndex === de.imageindex) {
                     controls.getArray(a, de);
                     controls.createImg(a, de);
-                    de.mf -= width*de.gundong;
+                    de.mf -= width * de.gundong;
                     if (-de.mf > width * (de.imageindex - de.number)) {
                         de.mf = -width * (de.imageindex - de.number);
                     }
-                }else{
-                    de.mf -= width*de.gundong;
+                } else {
+                    de.mf -= width * de.gundong;
                     de.imageindex += de.gundong;
                 }
                 // if(lastLiImageIndex-de.savenumber > de.imageindex){
                 //     //
-                //     console.log(1);
                 // }else{
 
                 // }
@@ -108,7 +108,6 @@
                     'margin-left': de.mf + 'px'
                 },
                 de.speed);
-            console.log(de.imageindex);
         },
         //往左
         left: function (a, de) {
@@ -123,12 +122,20 @@
                 de.mf = 0;
             }
             if (de.savenumber) {
-                if(de.cacheArray.length !== 0){
-                    if (de.number+de.savenumber<=de.imageindex){
+                if (de.cacheArray.length !== 0) {
+                    if (de.number + de.savenumber <= de.imageindex) {
                         for (var i = 0; i < de.gundong; i++) {
-                            $("<li style='left:"+(de.imageindex-de.number-de.savenumber)*de.parentW / de.number+'px'+"'><img style='width:" + width + ";'></li>").prependTo($(a).find(de.items));
-                            $(a).find("img")[0].src = de.cacheArray[de.imageindex-de.number-de.savenumber];
-                            de.cacheArray[de.imageindex-de.number-de.savenumber] = null;
+                            if (de.gundong === 1) {
+                                $("<li style='left:" + (de.imageindex - de.number - de.savenumber) * de.parentW / de.number + 'px' + "'><img style='width:" + width + ";'></li>").prependTo($(a).find(de.items));
+                                $(a).find("img")[0].src = de.cacheArray[de.imageindex - de.number - de.savenumber];
+                                // de.cacheArray[de.imageindex - de.number - de.savenumber] = null;
+                            } else {
+                                $("<li style='left:" + (de.imageindex - de.savenumber - i-1) * de.parentW / de.number + 'px' + "'><img style='width:" + width + ";'></li>").prependTo($(a).find(de.items));
+                                console.log(de.cacheArray[de.imageindex - de.savenumber - i-1]);
+                                $(a).find("img")[0].src = de.cacheArray[de.imageindex - de.savenumber - i-1];
+                                // de.cacheArray[de.imageindex - de.number - de.savenumber-1] = null;
+
+                            }
                         }
                     }
                 }
@@ -136,7 +143,6 @@
             $(a).find(de.items).stop().animate({
                 'margin-left': de.mf + 'px'
             }, de.speed);
-            console.log(de.imageindex);
         }
     };
     var methods = {
@@ -202,31 +208,27 @@
     var keep = {
         recovery: function (a, de) {
             if (de.savenumber) {
-                    de.cacheArray = [];
-                    var ulCurrentMl = $(a).find(de.items).css('margin-left');
-                    recoveryTime = setInterval(function(){
-                    var lastImageIndex = parseInt($(a).find(de.items).children('li').last().css('left'))/(de.parentW / de.number) + 1;
+                de.cacheArray = [];
+                var ulCurrentMl = $(a).find(de.items).css('margin-left');
+                recoveryTime = setInterval(function () {
+                    var lastImageIndex = parseInt($(a).find(de.items).children('li').last().css('left')) / (de.parentW / de.number) + 1;
                     //删除前面
-                        if(de.savenumber < de.imageindex-de.number){
-                            for (var i = 0; i < de.imageindex-de.number-de.savenumber; i++) {
-                                // console.log(i);
-                                if(!de.cacheArray[i]){
-                                    de.cacheArray[i] = $(a).find(de.items).children('li').eq(0).find('img')[0].src;
-                                    $(a).find(de.items).children('li').eq(0).remove();
-                                }
-                                console.log(de.cacheArray);
+                    if (de.savenumber < de.imageindex - de.number) {
+                        for (var i = 0; i < de.imageindex - de.number - de.savenumber; i++) {
+                            if (!de.cacheArray[i]) {
+                                de.cacheArray[i] = $(a).find(de.items).children('li').eq(0).find('img')[0].src;
+                                $(a).find(de.items).children('li').eq(0).remove();
                             }
                         }
-                        //删除后面
-                        if (lastImageIndex > de.imageindex + de.savenumber) {
-                            for(var j = 0; j < lastImageIndex - (de.imageindex + de.savenumber);j++){
-                                console.log(j);
-                                de.cacheArray[lastImageIndex - 1] = $(a).find(de.items).children('li').last().find('img')[0].src;
-                                $(a).find(de.items).children('li').last().remove();
-                                console.log(de.cacheArray);
-                            }
+                    }
+                    //删除后面
+                    if (lastImageIndex > de.imageindex + de.savenumber) {
+                        for (var j = 0; j < lastImageIndex - (de.imageindex + de.savenumber); j++) {
+                            de.cacheArray[lastImageIndex - 1] = $(a).find(de.items).children('li').last().find('img')[0].src;
+                            $(a).find(de.items).children('li').last().remove();
                         }
-                    },5000);
+                    }
+                }, 5000);
             }
         }
     };
@@ -252,7 +254,7 @@ $(function () {
     $('.slider').silder({
         number: 3, //图数量
         gundong: 1, //滚动数量
-        savenumber: 2, //显示前后保存的数据
+        savenumber: 3, //显示前后保存的数据
         autochange: true, //是否自动适应平铺
         autoplay: false, //自动播放
         arrow: true, //有箭头
