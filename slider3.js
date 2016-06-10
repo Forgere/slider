@@ -69,18 +69,19 @@
                 nav('arrow');
             }
             //  Patch for fluid-width sliders. Screw those guys.
-            if (o.fluid) {
+            if (o.autochange) {
                 $(window).resize(function() {
+                    var sliderWidth = Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number;
                     _.r && clearTimeout(_.r);
 
                     _.r = setTimeout(function() {
-                        var styl = {},
-                        // var styl = {height: li.eq(_.i).outerHeight()},
-                        width = el.width();
-                        ul.css(styl);
-                        styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
-                        el.css(styl);
-                        li.css({ width: el[0].getBoundingClientRect().width });
+                        el.width(sliderWidth);
+                        el.find('img').width(sliderWidth/_.o.number);
+                        var liWidth = el.find(_.o.items).children('li').eq(0).width();
+                        for (var i = 0; i < el.find(_.o.items).children('li').length; i++) {
+                            el.find(_.o.items).children('li').eq(i).css('left',liWidth * i);
+                        }
+                        el.find(_.o.items).css('left', (_.o.number-_.i)*liWidth);
                     }, 50);
                 }).resize();
             };
@@ -123,7 +124,7 @@
                 //  Handle those pesky dots
                 // el.find('.dot').eq(index).addClass('active').siblings().removeClass('active');
 
-                el.animate(obj, speed, easing) && ul.animate($.extend({left: (_.o.number-index)*_.liWidth}, obj), speed, easing, function(data) {
+                el.animate(obj, speed, easing) && ul.animate($.extend({left: (_.o.number-index)*Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number/_.o.number}, obj), speed, easing, function(data) {
                     _.i = index;
                     console.log(_.i);
                 });
@@ -162,7 +163,7 @@
         };
         //加入图片
         _.addImage = function(array){
-            $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
+            $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
             array.shift();
         };
         //  Create dots and arrows
@@ -204,9 +205,9 @@
 
 })(jQuery);
 $(function () {
-    romoteArray = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '1.jpg', '2.jpg', '3.jpg'];
+    romoteArray = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg','10.jpg','11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg','20.jpg'];
     $('.slider').silder({
-        number: 1, //图数量
+        number: 3, //图数量
         savenumber: 3, //显示前后保存的数据
         autochange: true, //是否自动适应平铺
         autoplay: false, //自动播放
