@@ -29,7 +29,6 @@
         _.init = function(el, o) {
             //  信息合并
             _.o = $.extend(_.o, o);
-
             _.el = el;
             _.ul = el.find(_.o.items);
             _.li = _.ul.find(_.o.item);
@@ -38,7 +37,8 @@
             console.log(_.parentW);
             //  当前图片index
             _.i = 0;
-
+            //已加载图片的最大index
+            _.maxI = _.o.number;
             //初始加赞图片
             _.o.array = romoteArray.slice(_.i, _.i + _.o.number);
             for (var i = 0; i < _.o.number; i++) {
@@ -101,6 +101,7 @@
                 current = _.i,
                 target = romoteArray[index];
                 console.log(_.i);
+                console.log(_.maxI);
             //  slider到达边缘条件
             if ((romoteArray.length+1 === _.i) && o.loop === false) {
                 _.i = index;
@@ -126,7 +127,7 @@
 
                 el.animate(obj, speed, easing) && ul.animate($.extend({left: (_.o.number-index)*Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number/_.o.number}, obj), speed, easing, function(data) {
                     _.i = index;
-                    console.log(_.i);
+                    _.maxI = (index > _.maxI) ? index : _.maxI;
                 });
             }
         };
@@ -158,11 +159,16 @@
         };
         //获取数据
         _.getArray = function(from,to){
-            _.o.array = romoteArray.slice(from, to);
+            if (to <= _.maxI) {
+                _.o.array = [];
+            }else{
+                _.o.array = romoteArray.slice(from, to);
+            }
             return _.o.array;
         };
         //加入图片
         _.addImage = function(array){
+            if (_.o.array.length === 0) {return;}
             $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
             array.shift();
         };
