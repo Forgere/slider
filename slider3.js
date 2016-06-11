@@ -168,32 +168,56 @@
         _.next = function () {
             if (romoteArray.length === _.i) return;
             _.getArray(_.i, _.i + 1);
-            _.addImage(_.o.array);
+            //判断要添加的图片是否不存在
+            var lastImageLeft = parseInt(_.el.find(_.o.items).children('li').last().css('left'));
+            var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
+            var lastImageIndex = lastImageLeft/width - 1;
+            if(_.i > lastImageIndex){
+                _.addImage(_.o.array);
+            }
             return _.stop().to(_.i + 1);
         };
         //  左箭头
         _.prev = function () {
             if (_.o.number === _.i) return;
+            if(_.o.savenumber){
+                var firstImageLeft = parseInt(_.el.find(_.o.items).children('li').first().css('left'));
+                var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
+                var firstImageIndex = firstImageLeft/width ;
+                console.log('firstImageIndex'+ firstImageIndex);
+                console.log(_.i-_.o.number-1);
+                _.getArray(_.i-_.o.number-1, _.i-_.o.number);
+                console.log(_.o.array);
+                //判断要添加的图片是否不存在
+                if(_.i-_.o.number-1 < firstImageIndex){
+                    _.addImage(_.o.array,'left');
+                }
+            }
             return _.stop().to(_.i - 1);
         };
         //获取数据
         _.getArray = function (from, to) {
             if (to <= _.maxI) {
-                _.o.array = [];
+                if(_.o.cache[from] == null || undefined){
+                    _.o.array = [];
+                }else{
+                    _.o.array[0] = _.o.cache[from];
+                }
             } else {
                 _.o.array = romoteArray.slice(from, to);
             }
             return _.o.array;
         };
         //加入图片
-        _.addImage = function (array) {
-            if (_.o.array.length === 0) {
+        _.addImage = function (array,direction) {
+            if (array.length === 0) {
                 return;
             }
             //lazyload support
             if (_.o.lazyload) {
-                _.lazyload(array);
+                _.lazyload(array,direction);
             } else {
+                // if (array[0] === '' || !array[0]) {array.shift();}
                 $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
                 array.shift();
             }
@@ -217,9 +241,14 @@
             });
         }
         //lazyload
-        _.lazyload = function (array) {
+        _.lazyload = function (array,direction) {
             var creatImg = $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
-            creatImg.appendTo(_.ul);
+            if(direction === 'left'){
+                creatImg = $("<li style='left:" + (_.i-_.o.number-1) * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
+                creatImg.prependTo(_.ul);
+            }else{
+                creatImg.appendTo(_.ul);
+            }
             var tmpimg = $("<img src=" + array[0] + ">");
             tmpimg.ready(function () {
                 setTimeout(function () {
@@ -246,8 +275,9 @@
                 var liEachLeft = parseInt(_.el.find(_.o.items).children('li').eq(i).css('left'));
                 var liEachWidth = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) * _.o.number / _.o.number;
                 var eachImageIndex = liEachLeft / liEachWidth;
-                console.log(eachImageIndex);
                 if(eachImageIndex < protectededFirst || eachImageIndex > protectededLast){
+                    //保存数据
+                    _.o.cache[eachImageIndex] = _.el.find(_.o.items).children('li').eq(i).find('img').attr('src');
                     _.el.find(_.o.items).children('li').eq(i).remove();
                 }
             }
