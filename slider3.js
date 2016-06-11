@@ -23,6 +23,7 @@
             array: [],
             cache: [],
             easing: 'swing',
+            lazyload:true,
             loading: 'loading.gif'
         };
 
@@ -169,12 +170,16 @@
         //加入图片
         _.addImage = function(array){
             if (_.o.array.length === 0) {return;}
-            $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
-            array.shift();
+            //lazyload support
+            if (_.o.lazyload) {
+                _.lazyload(array);
+            }else{
+                $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
+                array.shift();
+            }
         };
         //  Create dots and arrows
         function nav(name, html) {
-                console.log(name);
             if (name == 'dot') {
                 html = '<ol class="dots">';
                     $.each(_.li, function(index) {
@@ -191,6 +196,18 @@
                 me.hasClass('dot') ? _.stop().to(me.index()) : me.hasClass('prev') ? _.prev() : _.next();
             });
         }
+        //lazyload
+        _.lazyload = function(array){
+            var creatImg =  $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src='loading.gif' style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
+            creatImg.appendTo(_.ul);
+            var tmpimg = $("<img src=" + array[0] + ">");
+            tmpimg.ready(function(){
+                setTimeout(function(){
+                    creatImg.find('img').attr('src', tmpimg.attr('src'));
+                },1000);
+            });
+            array.shift();
+        };
     };
 
     //  Create a jQuery plugin
