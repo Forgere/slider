@@ -36,7 +36,6 @@
             _.li = _.ul.find(_.o.item);
             _.parentW = Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number;
             _.liWidth = _.parentW / _.o.number;
-            console.log(_.parentW);
             //  当前图片index
             _.i = 0;
             //已加载图片的最大index
@@ -99,7 +98,7 @@
                     function(){
                     _.protectMemory();
                     }
-                    ,3000);
+                    ,100);
             }
             return _;
         };
@@ -116,8 +115,6 @@
                 li = _.li,
                 current = _.i,
                 target = romoteArray[index];
-            console.log(_.i);
-            console.log(_.maxI);
             //  slider到达边缘条件
             if ((romoteArray.length + 1 === _.i) && o.loop === false) {
                 _.i = index;
@@ -168,6 +165,8 @@
         _.next = function () {
             if (romoteArray.length === _.i) return;
             _.getArray(_.i, _.i + 1);
+            console.log(_.i);
+            console.log(_.o.array);
             //判断要添加的图片是否不存在
             var lastImageLeft = parseInt(_.el.find(_.o.items).children('li').last().css('left'));
             var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
@@ -184,9 +183,8 @@
                 var firstImageLeft = parseInt(_.el.find(_.o.items).children('li').first().css('left'));
                 var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
                 var firstImageIndex = firstImageLeft/width ;
-                console.log('firstImageIndex'+ firstImageIndex);
-                console.log(_.i-_.o.number-1);
                 _.getArray(_.i-_.o.number-1, _.i-_.o.number);
+                console.log(_.i);
                 console.log(_.o.array);
                 //判断要添加的图片是否不存在
                 if(_.i-_.o.number-1 < firstImageIndex){
@@ -292,11 +290,11 @@
         return this.each(function (index) {
             //  Cache a copy of $(this), so it
             var me = $(this),
-                key = 'unslider' + (len > 1 ? '-' + ++index : ''),
+                // key = 'unslider' + (len > 1 ? '-' + ++index : ''),
                 instance = (new Slider).init(me, o);
 
             //  Invoke an Unslider instance
-            me.data(key, instance).data('key', key);
+            // me.data(key, instance).data('key', key);
         });
     };
 
