@@ -24,7 +24,8 @@
             cache: [],
             easing: 'swing',
             lazyload:true,
-            loading: 'loading.gif'
+            loading: 'loading.gif',
+            fadeIn: false
         };
 
         _.init = function(el, o) {
@@ -205,13 +206,17 @@
         }
         //lazyload
         _.lazyload = function(array){
-            var creatImg =  $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src='loading.gif' style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
+            var creatImg =  $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src="+_.o.loading+" style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
             creatImg.appendTo(_.ul);
             var tmpimg = $("<img src=" + array[0] + ">");
             tmpimg.ready(function(){
                 setTimeout(function(){
                     //fadeIn
-                    creatImg.find('img').attr('src', tmpimg.attr('src')).hide().fadeIn('slow');
+                    if(_.o.fadeIn){
+                        creatImg.find('img').attr('src', tmpimg.attr('src')).hide().fadeIn('slow');
+                    }else{
+                        creatImg.find('img').attr('src', tmpimg.attr('src'));
+                    }
                 },1000);
             });
             array.shift();
@@ -246,6 +251,10 @@ $(function () {
         duration: 3000, //自动播放时延迟
         speed: 200, //箭头滚动速度
         autospeed: 'slow', //自动播放速度
-        loading: null
+        lazyload:true,  //是否开启lazyload
+        loading: 'loading.gif', //加载中的图片
+        fadeIn: true, //开启fadeIn滚动特效
     });
+
+
 });
