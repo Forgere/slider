@@ -42,11 +42,18 @@
             _.maxI = _.o.number;
             //初始加赞图片
             _.o.array = romoteArray.slice(_.i, _.i + _.o.number);
-            for (var i = 0; i < _.o.number; i++) {
-                $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + _.o.array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
-                _.i++;
-                //清空数组
-                _.o.array.shift();
+            if(_.o.lazyload){
+                for (var i = 0; i < _.o.number; i++) {
+                    _.addImage(_.o.array);
+                    _.i++;
+                }
+            }else{
+                for (var i = 0; i < _.o.number; i++) {
+                    $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + _.o.array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
+                    _.i++;
+                    //清空数组
+                    _.o.array.shift();
+                }
             }
             //高度
             _.ul.height('100%');
@@ -203,7 +210,8 @@
             var tmpimg = $("<img src=" + array[0] + ">");
             tmpimg.ready(function(){
                 setTimeout(function(){
-                    creatImg.find('img').attr('src', tmpimg.attr('src'));
+                    //fadeIn
+                    creatImg.find('img').attr('src', tmpimg.attr('src')).hide().fadeIn('slow');
                 },1000);
             });
             array.shift();
