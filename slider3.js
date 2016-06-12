@@ -48,7 +48,7 @@
                     _.i++;
                 }
             } else {
-                for (var i = 0; i < _.o.number; i++) {
+                for (var j = 0; j < _.o.number; j++) {
                     $("<li style='left:" + _.i * _.parentW / _.o.number + 'px' + "'><img src=" + _.o.array[0] + " style='width:" + _.liWidth + ";'></li>").appendTo(_.ul);
                     _.i++;
                     //清空数组
@@ -81,28 +81,37 @@
                 $(window).resize(function () {
                     var sliderWidth = Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number;
                     _.r && clearTimeout(_.r);
-
                     _.r = setTimeout(function () {
+                        var beforeSaveLiList = el.find(_.o.items).children('li');
+                        var beforeSaveWidth = parseInt(el.find(_.o.items).children('li').eq(0).width());
                         el.width(sliderWidth);
                         el.find('img').width(sliderWidth / _.o.number);
-                        var liWidth = el.find(_.o.items).children('li').eq(0).width();
-                        for (var i = 0; i < el.find(_.o.items).children('li').length; i++) {
-                            el.find(_.o.items).children('li').eq(i).css('left', liWidth * i);
+                        var liWidth = beforeSaveLiList.eq(0).width();
+                        for (var i = 0; i < beforeSaveLiList.length; i++) {
+                            var beforeIndex = Math.floor(parseInt(beforeSaveLiList.eq(i).css('left'))/beforeSaveWidth);
+                            beforeSaveLiList.eq(beforeIndex).css('left', liWidth * beforeIndex);
                         }
                         el.find(_.o.items).css('left', (_.o.number - _.i) * liWidth);
                     }, 50);
                 }).resize();
             }
+            _.el.hover(function() {
+                /* Stuff to do when the mouse enters the element */
+                clearInterval(_.protectTime);
+            },function(){
+                _.protect();
+            });
+            return _;
+        };
+        _.protect = function(){
             if(_.o.savenumber){
-                var protectTime = setInterval(
+                _.protectTime = setTimeout(
                     function(){
                     _.protectMemory();
                     }
                     ,100);
             }
-            return _;
         };
-
         //  根据_.i移动ul
         _.to = function (index, callback) {
             if (_.t) {
@@ -200,7 +209,6 @@
             } else {
                 _.o.array = romoteArray.slice(from, to);
             }
-            console.log(_.o.array);
             return _.o.array;
         };
         //加入图片
@@ -265,15 +273,16 @@
             //限制修正这两个index
             protectededFirst = (protectededFirst < 0) ? 0 : protectededFirst;
             protectededLast = (protectededLast > _.maxI) ? _.maxI : protectededLast;
+            var currentLiList = _.el.find(_.o.items).children('li');
+            var liEachWidth = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) * _.o.number / _.o.number;
             //删除其他图片
-            for (var i = 0; i < _.el.find(_.o.items).children('li').length; i++) {
-                var liEachLeft = parseInt(_.el.find(_.o.items).children('li').eq(i).css('left'));
-                var liEachWidth = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) * _.o.number / _.o.number;
+            for (var i = 0; i < currentLiList.length; i++) {
+                var liEachLeft = parseInt(currentLiList.eq(i).css('left'));
                 var eachImageIndex = liEachLeft / liEachWidth;
                 if(eachImageIndex < protectededFirst || eachImageIndex > protectededLast){
                     //保存数据
-                    _.o.cache[eachImageIndex] = _.el.find(_.o.items).children('li').eq(i).find('img').attr('src');
-                    _.el.find(_.o.items).children('li').eq(i).remove();
+                    _.o.cache[eachImageIndex] = currentLiList.eq(i).find('img').attr('src');
+                    currentLiList.eq(i).remove();
                 }
             }
         };
@@ -299,8 +308,8 @@
 $(function () {
     romoteArray = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     $('.slider').silder({
-        number: 4, //图数量
-        savenumber: 6, //显示前后保存的数据
+        number: 3, //图数量
+        savenumber: 3, //显示前后保存的数据
         autochange: true, //是否自动适应平铺
         autoplay: false, //自动播放
         arrows: true, //有箭头
