@@ -44,7 +44,7 @@
             _.o.array = romoteArray.slice(_.i, _.i + _.o.number);
             if (_.o.lazyload) {
                 for (var i = 0; i < _.o.number; i++) {
-                    _.addImage(_.o.array);
+                    _.addImage(_.o.array,'right',_.i);
                     _.i++;
                 }
             } else {
@@ -151,7 +151,7 @@
                 el.animate(obj, speed, easing) && ul.animate($.extend({
                     left: (_.o.number - index) * Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number / _.o.number
                 }, obj), speed, easing, function (data) {
-                    _.i = index;
+                 
                     _.maxI = (index > _.maxI) ? index : _.maxI;
                 });
             }
@@ -173,30 +173,32 @@
         //  右箭头
         _.next = function () {
             if (romoteArray.length === _.i) return;
-            _.getArray(_.i, _.i + 1);
+            _.i ++;
+            _.getArray(_.i - 1, _.i);
             //判断要添加的图片是否不存在
             var lastImageLeft = parseInt(_.el.find(_.o.items).children('li').last().css('left'));
             var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
             var lastImageIndex = lastImageLeft/width - 1;
             if(_.i > lastImageIndex){
-                _.addImage(_.o.array);
+                _.addImage(_.o.array,'right',_.i-1);
             }
-            return _.stop().to(_.i + 1);
+            return _.stop().to(_.i);
         };
         //  左箭头
         _.prev = function () {
-            if (_.o.number === _.i) return;
+        	_.i --;
+            if (_.o.number === _.i+1) return;
             if(_.o.savenumber){
                 var firstImageLeft = parseInt(_.el.find(_.o.items).children('li').first().css('left'));
                 var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
                 var firstImageIndex = firstImageLeft/width ;
-                _.getArray(_.i-_.o.number-1, _.i-_.o.number);
+                _.getArray(_.i-_.o.number, _.i-_.o.number+1);
                 //判断要添加的图片是否不存在
-                if(_.i-_.o.number-1 < firstImageIndex){
-                    _.addImage(_.o.array,'left');
+                if(_.i-_.o.number < firstImageIndex){
+                    _.addImage(_.o.array,'left',_.i+1);
                 }
             }
-            return _.stop().to(_.i - 1);
+            return _.stop().to(_.i);
         };
         //获取数据
         _.getArray = function (from, to) {
@@ -212,16 +214,16 @@
             return _.o.array;
         };
         //加入图片
-        _.addImage = function (array,direction) {
+        _.addImage = function (array,direction,index) {
             if (array.length === 0) {
                 return;
             }
             //lazyload support
             if (_.o.lazyload) {
-                _.lazyload(array,direction);
+                _.lazyload(array,direction,index);
             } else {
                 // if (array[0] === '' || !array[0]) {array.shift();}
-                $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
+                $("<li style='left:" + (_.i-1) * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + array[0] + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>").appendTo(_.ul);
                 array.shift();
             }
         };
@@ -244,10 +246,11 @@
             });
         }
         //lazyload
-        _.lazyload = function (array,direction) {
-            var creatImg = $("<li style='left:" + _.i * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
+        _.lazyload = function (array,direction,index) {
+        	console.log(_.i);
+            var creatImg = $("<li style='left:" + index * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
             if(direction === 'left'){
-                creatImg = $("<li style='left:" + (_.i-_.o.number-1) * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
+                creatImg = $("<li style='left:" + (index-_.o.number-1) * Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + 'px' + "'><img src=" + _.o.loading + " style='width:" + Math.floor(parseInt(_.el.parent().css('width')) / _.o.number) + ";'></li>");
                 creatImg.prependTo(_.ul);
             }else{
                 creatImg.appendTo(_.ul);
