@@ -1,5 +1,6 @@
 .slider{
 	overflow: hidden;
+	height: 100%;
 }
 ul{
 	list-style: none;
@@ -7,6 +8,7 @@ ul{
 	padding-left: 0;
 	position: relative;
 	margin: 0 auto;
+	height: 100%;
 }
 li{
 	position: absolute;
@@ -15,4 +17,8 @@ li{
 span{
 	font-size: 26px;
 	cursor: pointer;
+}
+.arrows{
+	position: absolute;
+	bottom: 0;
 }

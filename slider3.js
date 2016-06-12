@@ -165,8 +165,6 @@
         _.next = function () {
             if (romoteArray.length === _.i) return;
             _.getArray(_.i, _.i + 1);
-            console.log(_.i);
-            console.log(_.o.array);
             //判断要添加的图片是否不存在
             var lastImageLeft = parseInt(_.el.find(_.o.items).children('li').last().css('left'));
             var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
@@ -184,8 +182,6 @@
                 var width = Math.floor(parseInt(_.el.parent().css('width')) / _.o.number);
                 var firstImageIndex = firstImageLeft/width ;
                 _.getArray(_.i-_.o.number-1, _.i-_.o.number);
-                console.log(_.i);
-                console.log(_.o.array);
                 //判断要添加的图片是否不存在
                 if(_.i-_.o.number-1 < firstImageIndex){
                     _.addImage(_.o.array,'left');
@@ -204,6 +200,7 @@
             } else {
                 _.o.array = romoteArray.slice(from, to);
             }
+            console.log(_.o.array);
             return _.o.array;
         };
         //加入图片
@@ -312,7 +309,7 @@ $(function () {
         autospeed: 'slow', //自动播放速度
         lazyload: true, //是否开启lazyload
         loading: 'loading.gif', //加载中的图片
-        fadeIn: true, //开启fadeIn滚动特效
+        fadeIn: true //开启fadeIn滚动特效
     });
 
 
