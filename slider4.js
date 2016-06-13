@@ -25,12 +25,12 @@
       fadeIn: false
     };
     options = $.extend(defaults, options);
+    $el = $that;
+    $ul = $that.find(options.items);
+    $li = $ul.find(options.item);
     this.each(function () {
       init = function () {
         //  信息合并
-        $el = $that;
-        $ul = $that.find(options.items);
-        $li = $ul.find(options.item);
         $parentW = Math.floor(parseInt($el.parent().css('width')) / options.number) * options.number;
         $liWidth = $parentW / options.number;
         //  当前图片index
