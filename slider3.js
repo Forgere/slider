@@ -134,24 +134,14 @@
                 return;
             }
 
-            //  无线循环
-            // if (romoteArray.length === _.i) index = 0;
-            // if (index < 0) index = romoteArray.length - 1;
-            // target = li.eq(index);
-
             var speed = callback ? 5 : o.speed | 0,
                 easing = o.easing,
                 obj = {};
-            // obj = {height: target.outerHeight()};
 
             if (!ul.queue('fx').length) {
-                //  Handle those pesky dots
-                // el.find('.dot').eq(index).addClass('active').siblings().removeClass('active');
-
                 el.animate(obj, speed, easing) && ul.animate($.extend({
                     left: (_.o.number - index) * Math.floor(parseInt(el.parent().css('width')) / _.o.number) * _.o.number / _.o.number
                 }, obj), speed, easing, function (data) {
-                 
                     _.maxI = (index > _.maxI) ? index : _.maxI;
                 });
             }
