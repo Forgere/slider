@@ -75,23 +75,21 @@
 				//  Patch for fluid-width sliders. Screw those guys.
 				if (options.autochange) {
 					$(window).resize(function () {
+            clearInterval($that.protectTime);
 						var sliderWidth = Math.floor(parseInt($el.parent().css('width')) / options.number) * options.number;
-						console.log(sliderWidth);
-						$that.r && clearTimeout($that.r);
+						$that.r && clearTimeout($that.r) && clearTimeout($that.protectTime);
 						$that.r = setTimeout(function () {
 							var beforeSaveLiList = $el.find(options.items).children('li');
 							var beforeSaveWidth = parseInt($el.find(options.items).children('li').eq(0).width());
 							$el.width(sliderWidth);
 							$el.find('img').width(sliderWidth / options.number);
 							var liWidth = beforeSaveLiList.eq(0).width();
-											console.log($that.i)
-				console.log($that.maxI)
 							for (var i = 0; i < beforeSaveLiList.length; i++) {
 								// var beforeIndex = Math.floor(parseInt(beforeSaveLiList.eq(i).css('left')) / beforeSaveWidth);
 								if($that.i === $that.maxI){
 									beforeSaveLiList.eq(i).css('left', liWidth * ($that.i - beforeSaveLiList.length + i));
 								}else if($that.maxI-options.savenumber > $that.i){
-									beforeSaveLiList.eq(i).css('left', liWidth * ($that.i - beforeSaveLiList.length +options.savenumber+ i));
+									beforeSaveLiList.eq(i).css('left', liWidth * ($that.i - beforeSaveLiList.length +options.savenumber+ i ));
 								}else{
 									beforeSaveLiList.eq(i).css('left', liWidth * ($that.maxI - beforeSaveLiList.length + i));
 								}
@@ -100,12 +98,16 @@
 						}, 50);
 					}).resize();
 				}
-				$el.hover(function () {
-					/* Stuff to do when the mouse enters the element */
-					clearInterval($that.protectTime);
-				}, function () {
-					protect();
-				});
+				// $el.hover(function () {
+				// 	 Stuff to do when the mouse enters the element 
+				// 	clearInterval($that.protectTime);
+				// }, function () {
+          setInterval(
+            function(){
+            protect();
+            }
+            ,1000);
+				// });
 				return $that;
 			}();
 
@@ -191,7 +193,7 @@
 					$that.protectTime = setTimeout(
 						function () {
 							protectMemory();
-						}, 100);
+						}, 50);
 				}
 			}
 
@@ -199,6 +201,9 @@
 				//留下的图片的index 从0开始
 				var protectededFirst = $that.i - (options.number + options.savenumber);
 				var protectededLast = $that.i + options.savenumber - 1;
+        console.log($that.i );
+        console.log(protectededFirst);
+        console.log(protectededLast);
 				//限制修正这两个index
 				protectededFirst = (protectededFirst < 0) ? 0 : protectededFirst;
 				protectededLast = (protectededLast > $that.maxI) ? $that.maxI : protectededLast;
@@ -232,6 +237,7 @@
 			}
 
 			function prev() {
+        if ($that.i === options.number) return;
 				$that.i--;
 				if (options.number === $that.i + 1) return;
 				if (options.savenumber) {
