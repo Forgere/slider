@@ -139,7 +139,7 @@
 			}
 
 			function lazyload(array, direction, index) {
-				var creatImg = $("<li style='left:" + index * Math.floor(parseInt($el.parent().css('width')) / options.number) + 'px' + "'><img src=" + options.loading + " style='width:" + Math.floor(parseInt($el.parent().css('width')) / options.number) + ";'></li>");
+				var creatImg = $("<li style='left:" + index * Math.floor(parseInt($el.parent().css('width')) / options.number) + 'px' + "'><img src=" + options.loading + " style='height:100%;width:" + Math.floor(parseInt($el.parent().css('width')) / options.number) + ";'></li>");
 				if (direction === 'left') {
 					creatImg = $("<li style='left:" + (index - options.number - 1) * Math.floor(parseInt($el.parent().css('width')) / options.number) + 'px' + "'><img src=" + options.loading + " style='width:" + Math.floor(parseInt($el.parent().css('width')) / options.number) + ";'></li>");
 					creatImg.prependTo($ul);
@@ -201,9 +201,6 @@
 				//留下的图片的index 从0开始
 				var protectededFirst = $that.i - (options.number + options.savenumber);
 				var protectededLast = $that.i + options.savenumber - 1;
-        console.log($that.i );
-        console.log(protectededFirst);
-        console.log(protectededLast);
 				//限制修正这两个index
 				protectededFirst = (protectededFirst < 0) ? 0 : protectededFirst;
 				protectededLast = (protectededLast > $that.maxI) ? $that.maxI : protectededLast;
@@ -220,7 +217,6 @@
 					}
 				}
 			}
-
 			function next() {
 				if (romoteArray.length === $that.i) return;
 				$that.i++;
@@ -291,7 +287,7 @@
 	};
 })(jQuery);
 $(function () {
-	romoteArray = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
+	romoteArray = ['001.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
 	$('.slider').slider({
 		number: 3, //图数量
 		savenumber: 3, //显示前后保存的数据
