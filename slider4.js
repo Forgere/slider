@@ -22,7 +22,8 @@
 			easing: 'swing',
 			lazyload: true,
 			loading: 'loading.gif',
-			fadeIn: false
+			fadeIn: false,
+			romoteArray:''
 		};
 		options = $.extend(defaults, options);
 		$el = $that;
@@ -38,7 +39,7 @@
 				//已加载图片的最大index
 				$that.maxI = options.number;
 				//初始加赞图片
-				options.array = romoteArray.slice($that.i, $that.i + options.number);
+				options.array = options.romoteArray.slice($that.i, $that.i + options.number);
 				if (options.lazyload) {
 					for (var i = 0; i < options.number; i++) {
 						addImage(options.array, 'right', $that.i);
@@ -119,7 +120,7 @@
 						options.array[0] = options.cache[from];
 					}
 				} else {
-					options.array = romoteArray.slice(from, to);
+					options.array = options.romoteArray.slice(from, to);
 				}
 				return options.array;
 			}
@@ -218,7 +219,7 @@
 				}
 			}
 			function next() {
-				if (romoteArray.length === $that.i) return;
+				if (options.romoteArray.length === $that.i) return;
 				$that.i++;
 				getArray($that.i - 1, $that.i);
 				//判断要添加的图片是否不存在
@@ -260,9 +261,9 @@
 					ul = $ul,
 					li = $li,
 					current = $that.i,
-					target = romoteArray[index];
+					target = options.romoteArray[index];
 				//  slider到达边缘条件
-				if ((romoteArray.length + 1 === $that.i) && options.loop === false) {
+				if ((options.romoteArray.length + 1 === $that.i) && options.loop === false) {
 					$that.i = index;
 					return;
 				}
@@ -299,6 +300,7 @@ $(function () {
 		autospeed: 'slow', //自动播放速度
 		lazyload: true, //是否开启lazyload
 		loading: 'loading.gif', //加载中的图片
-		fadeIn: true //开启fadeIn滚动特效
+		fadeIn: true, //开启fadeIn滚动特效
+		romoteArray:romoteArray
 	});
 });
