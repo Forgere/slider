@@ -52,6 +52,7 @@
           this.onreachLastImage();
         }
       }
+      // this.onAddEvent(1,'click',function(){alert(1);});
       //高度
       this.ul.height('100%');
       //  Autoslide
@@ -261,7 +262,6 @@
     this.lazyload = function (array, direction, index,inner) {
       var creatImg = $(inner);
       creatImg.css('left',index * this.liWidth+'px').find('img').width(this.liWidth).attr('src', this.o.loading);
-      this.onAddEvent();
       if (direction === 'left') {
         creatImg.css('left',(index - this.o.number - 1) * this.liWidth + 'px').prependTo(this.ul).find('img').width(this.liWidth);
       } else {
@@ -308,6 +308,17 @@
           currentLiList.eq(i).remove();
         }
       }
+    },
+    //给某一个li添加事件
+    this.onAddEvent = function(index,event,func){
+      $.each(that.ul.children('li'),function(i){
+        if(parseInt(that.ul.children('li').eq(i).css('left'))/that.liWidth === index){
+          that.ul.on(event, this, function(event) {
+            event.stopPropagation();
+            func();
+          });
+        }
+      });
     },
     //第一张
     this.onNoLoopReachFirst = function(){
